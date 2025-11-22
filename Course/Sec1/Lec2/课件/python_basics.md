@@ -12,6 +12,7 @@
 8. [日期和时间处理](#日期和时间处理)
 9. [文件操作](#文件操作)
 10. [文件系统操作](#文件系统操作)
+11. [面向对象编程](#面向对象编程)
 
 ---
 
@@ -678,6 +679,144 @@ with open(filepath, "w", encoding="utf-8") as f:
 
 ---
 
+## 面向对象编程
+
+### 类和对象
+
+面向对象编程（OOP）是一种编程范式，通过类和对象来组织代码。类是一个模板，对象是类的实例。
+
+```python
+# 定义一个简单的类
+class Person:
+    """人类"""
+
+    # __init__ 是构造函数，创建对象时自动调用
+    def __init__(self, name, age):
+        self.name = name  # self 代表对象本身
+        self.age = age
+
+    # 定义方法（函数）
+    def introduce(self):
+        """自我介绍"""
+        return f"我是{self.name}，今年{self.age}岁"
+
+    def have_birthday(self):
+        """过生日，年龄加1"""
+        self.age += 1
+        return f"{self.name}过生日了，现在{self.age}岁"
+
+# 创建对象（实例化）
+person1 = Person("张三", 25)
+person2 = Person("李四", 30)
+
+# 访问属性
+print(person1.name)  # "张三"
+print(person2.age)   # 30
+
+# 调用方法
+print(person1.introduce())  # "我是张三，今年25岁"
+person1.have_birthday()     # "张三过生日了，现在26岁"
+```
+
+### 类属性和实例属性
+
+```python
+class Student:
+    # 类属性（所有实例共享）
+    school = "Python学校"
+
+    def __init__(self, name, grade):
+        # 实例属性（每个对象独有）
+        self.name = name
+        self.grade = grade
+
+    def info(self):
+        return f"{self.name}在{self.school}，{self.grade}年级"
+
+student1 = Student("小明", 1)
+student2 = Student("小红", 2)
+
+print(student1.school)  # "Python学校"
+print(student2.school)  # "Python学校"
+
+# 修改类属性会影响所有实例
+Student.school = "新学校"
+print(student1.school)  # "新学校"
+```
+
+### 继承
+
+继承允许一个类（子类）继承另一个类（父类）的属性和方法。
+
+```python
+# 父类（基类）
+class Animal:
+    def __init__(self, name):
+        self.name = name
+
+    def speak(self):
+        return f"{self.name}在叫"
+
+# 子类（派生类）
+class Dog(Animal):
+    def speak(self):
+        # 重写父类方法
+        return f"{self.name}在汪汪叫"
+
+    def fetch(self):
+        # 子类特有的方法
+        return f"{self.name}去捡球了"
+
+class Cat(Animal):
+    def speak(self):
+        return f"{self.name}在喵喵叫"
+
+# 使用继承
+dog = Dog("旺财")
+cat = Cat("小花")
+
+print(dog.speak())  # "旺财在汪汪叫"
+print(cat.speak())  # "小花在喵喵叫"
+print(dog.fetch())  # "旺财去捡球了"
+```
+
+### 实际应用示例
+
+```python
+class NewsArticle:
+    """新闻文章类"""
+
+    def __init__(self, title, link, content=""):
+        self.title = title
+        self.link = link
+        self.content = content
+
+    def get_summary(self, max_length=100):
+        """获取摘要"""
+        if len(self.content) <= max_length:
+            return self.content
+        return self.content[:max_length] + "..."
+
+    def save_to_file(self, filename):
+        """保存到文件"""
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(f"标题: {self.title}\n")
+            f.write(f"链接: {self.link}\n")
+            f.write(f"\n内容:\n{self.content}")
+
+# 使用类
+article = NewsArticle(
+    title="Python 学习指南",
+    link="https://example.com",
+    content="这是一篇关于Python学习的文章..."
+)
+
+print(article.get_summary(50))  # "这是一篇关于Python学习的文章..."
+article.save_to_file("news.txt")
+```
+
+---
+
 ## 异常处理
 
 ```python
@@ -758,6 +897,7 @@ person.__dict__         # {"name": "张三"} (所有属性)
 - 模块导入
 - 日期和时间处理
 - 文件操作和文件系统操作
+- 面向对象编程（类、对象、继承）
 - 异常处理
 
 ### 项目实战要点
@@ -809,11 +949,16 @@ person.__dict__         # {"name": "张三"} (所有属性)
    - `f.write()` - 写入文件内容
 
 8. **函数定义**：
+
    - `def clean_filename()` - 定义清理文件名的函数
+
+9. **面向对象编程**：
+   - 使用类来组织代码，提高代码的可维护性和复用性
+   - 可以将 `news.py` 中的功能封装成类，例如 `NewsCrawler` 类
 
 继续学习建议：
 
-- 面向对象编程（类、继承、多态）
+- 面向对象高级特性（多态、封装、特殊方法）
 - 正则表达式（re 模块）
 - 网络请求（requests 库）
 - HTML 解析（BeautifulSoup）
