@@ -8,12 +8,15 @@
 4. [常用功能](#常用功能)
 5. [错误处理](#错误处理)
 6. [实际应用示例](#实际应用示例)
+7. [使用无问 API（Infini-AI）](#使用无问-apiinfini-ai)
+8. [最佳实践](#最佳实践)
 
 ---
 
 ## API 简介
 
 OpenAI API 提供了强大的 AI 功能，包括：
+
 - **文本生成**：生成文章、对话、代码等
 - **文本理解**：总结、翻译、问答等
 - **代码生成**：根据描述生成代码
@@ -29,10 +32,18 @@ OpenAI API 提供了强大的 AI 功能，包括：
 
 ## 安装和配置
 
-### 1. 安装 OpenAI 库
+### 1. 安装所需库
+
+**安装 OpenAI 库**
 
 ```bash
 pip install openai
+```
+
+**安装 requests 库（用于调用第三方 API）**
+
+```bash
+pip install requests
 ```
 
 ### 2. 获取 API Key
@@ -44,7 +55,7 @@ pip install openai
 
 ### 3. 配置 API Key
 
-**方法1：环境变量（推荐）**
+**方法 1：环境变量（推荐）**
 
 ```bash
 # Windows
@@ -54,7 +65,7 @@ set OPENAI_API_KEY=your-api-key-here
 export OPENAI_API_KEY=your-api-key-here
 ```
 
-**方法2：在代码中设置（仅用于测试，不推荐用于生产环境）**
+**方法 2：在代码中设置（仅用于测试，不推荐用于生产环境）**
 
 ```python
 import os
@@ -218,6 +229,7 @@ print(response.choices[0].message.content)
 ```
 
 **参数说明：**
+
 - `temperature`：0-2，控制输出的随机性
   - 0：完全确定，适合需要准确答案的任务
   - 1：平衡（默认）
@@ -245,16 +257,16 @@ try:
         ]
     )
     print(response.choices[0].message.content)
-    
+
 except RateLimitError as e:
     print(f"请求过于频繁，请稍后再试: {e}")
-    
+
 except APIConnectionError as e:
     print(f"网络连接错误: {e}")
-    
+
 except APIError as e:
     print(f"API 错误: {e}")
-    
+
 except Exception as e:
     print(f"其他错误: {e}")
 ```
@@ -278,7 +290,7 @@ client = OpenAI()
 
 ## 实际应用示例
 
-### 示例1：智能问答助手
+### 示例 1：智能问答助手
 
 ```python
 from openai import OpenAI
@@ -289,20 +301,20 @@ class ChatBot:
         self.messages = [
             {"role": "system", "content": "你是一个友好的助手，用简洁的语言回答问题。"}
         ]
-    
+
     def chat(self, user_input):
         """添加用户消息并获取回复"""
         self.messages.append({"role": "user", "content": user_input})
-        
+
         response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=self.messages,
             temperature=0.7
         )
-        
+
         assistant_reply = response.choices[0].message.content
         self.messages.append({"role": "assistant", "content": assistant_reply})
-        
+
         return assistant_reply
 
 # 使用示例
@@ -311,7 +323,7 @@ print(bot.chat("Python 是什么？"))
 print(bot.chat("它有什么优点？"))
 ```
 
-### 示例2：文本摘要工具
+### 示例 2：文本摘要工具
 
 ```python
 from openai import OpenAI
@@ -319,9 +331,9 @@ from openai import OpenAI
 def summarize_text(text, max_length=100):
     """总结文本内容"""
     client = OpenAI()
-    
+
     prompt = f"请用不超过 {max_length} 字总结以下内容：\n\n{text}"
-    
+
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -330,7 +342,7 @@ def summarize_text(text, max_length=100):
         max_tokens=max_length,
         temperature=0.3  # 较低的温度，更准确
     )
-    
+
     return response.choices[0].message.content
 
 # 使用示例
@@ -343,21 +355,21 @@ summary = summarize_text(article, max_length=50)
 print(summary)
 ```
 
-### 示例3：代码审查助手
+### 示例 3：代码审查助手
 
-```python
+````python
 from openai import OpenAI
 
 def review_code(code):
     """审查代码并提供改进建议"""
     client = OpenAI()
-    
+
     prompt = f"""请审查以下 Python 代码，指出潜在问题并提供改进建议：
 
 ```python
 {code}
 ```"""
-    
+
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -365,7 +377,7 @@ def review_code(code):
         ],
         temperature=0.3
     )
-    
+
     return response.choices[0].message.content
 
 # 使用示例
@@ -379,7 +391,237 @@ def calculate_sum(numbers):
 
 review = review_code(code)
 print(review)
+````
+
+---
+
+## 使用无问 API（Infini-AI）
+
+除了 OpenAI 官方 API，还有一些兼容 OpenAI 格式的第三方 API 服务，例如无问 API（Infini-AI）。这些服务提供了更多模型选择，可能在某些场景下更加经济实惠。
+
+### 1. 配置无问 API
+
+**获取 API Key**
+
+1. 访问 [Infini-AI 平台](https://cloud.infini-ai.com/)
+2. 注册并获取 API Key
+
+**设置环境变量**
+
+```bash
+# Linux/Mac
+export API_KEY=your-api-key-here
+
+# Windows
+set API_KEY=your-api-key-here
 ```
+
+### 2. 基础使用（使用 requests 库）
+
+无问 API 兼容 OpenAI 的接口格式，但使用不同的端点。以下是使用 requests 库的示例：
+
+```python
+import os
+import requests
+import json
+
+# 获取 API Key
+API_KEY = os.getenv("API_KEY")
+if not API_KEY:
+    raise RuntimeError("API_KEY 环境变量未设置")
+
+# API 端点
+url = "https://cloud.infini-ai.com/maas/v1/chat/completions"
+
+# 设置请求头
+headers = {
+    "Authorization": f"Bearer {API_KEY}",
+    "Content-Type": "application/json",
+}
+
+# 构建请求数据
+data = {
+    "model": "deepseek-v3.2",  # 使用的模型
+    "messages": [
+        {"role": "user", "content": "你是谁"}
+    ]
+}
+
+# 发送请求
+response = requests.post(url, headers=headers, json=data, timeout=30)
+
+# 检查错误
+response.raise_for_status()
+
+# 解析结果
+result = response.json()
+
+# 获取模型回复
+reply = result["choices"][0]["message"]["content"]
+print("模型回复：")
+print(reply)
+```
+
+### 3. 完整示例：对话助手
+
+```python
+import os
+import requests
+import json
+
+class InfiniChatBot:
+    def __init__(self, model="deepseek-v3.2"):
+        self.api_key = os.getenv("API_KEY")
+        if not self.api_key:
+            raise RuntimeError("API_KEY 环境变量未设置")
+
+        self.url = "https://cloud.infini-ai.com/maas/v1/chat/completions"
+        self.model = model
+        self.messages = []
+
+    def chat(self, user_input, system_prompt=None):
+        """发送消息并获取回复"""
+        # 如果是第一条消息且提供了系统提示
+        if system_prompt and not self.messages:
+            self.messages.append({"role": "system", "content": system_prompt})
+
+        # 添加用户消息
+        self.messages.append({"role": "user", "content": user_input})
+
+        # 构建请求
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+
+        data = {
+            "model": self.model,
+            "messages": self.messages,
+            "temperature": 0.7
+        }
+
+        try:
+            # 发送请求
+            response = requests.post(self.url, headers=headers, json=data, timeout=30)
+            response.raise_for_status()
+
+            result = response.json()
+
+            # 获取助手回复
+            assistant_reply = result["choices"][0]["message"]["content"]
+            self.messages.append({"role": "assistant", "content": assistant_reply})
+
+            return assistant_reply
+
+        except requests.exceptions.RequestException as e:
+            return f"请求错误: {e}"
+        except KeyError as e:
+            return f"响应格式错误: {e}"
+
+    def reset(self):
+        """重置对话历史"""
+        self.messages = []
+
+# 使用示例
+bot = InfiniChatBot()
+print(bot.chat("你好，请介绍一下 Python 语言", system_prompt="你是一个编程专家"))
+print("\n" + "="*50 + "\n")
+print(bot.chat("它有哪些优点？"))
+```
+
+### 4. 使用 OpenAI 库调用无问 API
+
+无问 API 兼容 OpenAI 的接口格式，因此也可以使用 OpenAI 库，只需修改 base_url：
+
+```python
+from openai import OpenAI
+import os
+
+# 创建客户端，指定自定义端点
+client = OpenAI(
+    api_key=os.getenv("API_KEY"),
+    base_url="https://cloud.infini-ai.com/maas/v1"
+)
+
+# 调用方式与 OpenAI 官方 API 完全相同
+response = client.chat.completions.create(
+    model="deepseek-v3.2",
+    messages=[
+        {"role": "user", "content": "用一句话介绍 Python"}
+    ]
+)
+
+print(response.choices[0].message.content)
+```
+
+### 5. 错误处理
+
+```python
+import os
+import requests
+import json
+
+def call_infini_api(prompt, model="deepseek-v3.2"):
+    """调用无问 API 并处理错误"""
+    api_key = os.getenv("API_KEY")
+    if not api_key:
+        return "错误: API_KEY 环境变量未设置"
+
+    url = "https://cloud.infini-ai.com/maas/v1/chat/completions"
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+
+    data = {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}]
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=data, timeout=30)
+        response.raise_for_status()
+
+        result = response.json()
+        return result["choices"][0]["message"]["content"]
+
+    except requests.exceptions.Timeout:
+        return "错误: 请求超时，请稍后重试"
+
+    except requests.exceptions.HTTPError as e:
+        return f"错误: HTTP 错误 {response.status_code} - {e}"
+
+    except requests.exceptions.ConnectionError:
+        return "错误: 网络连接失败"
+
+    except KeyError:
+        return "错误: 返回数据格式不正确"
+
+    except Exception as e:
+        return f"错误: {str(e)}"
+
+# 使用示例
+result = call_infini_api("介绍一下深度学习")
+print(result)
+```
+
+### 6. 可用模型
+
+无问 API 提供多种模型选择，例如：
+
+- `deepseek-v3.2`：强大的通用模型
+- 其他模型请参考官方文档
+
+### 7. OpenAI API vs 无问 API 对比
+
+| 特性         | OpenAI API                  | 无问 API                               |
+| ------------ | --------------------------- | -------------------------------------- |
+| **接口格式** | OpenAI 标准格式             | 兼容 OpenAI 格式                       |
+| **端点**     | `https://api.openai.com/v1` | `https://cloud.infini-ai.com/maas/v1`  |
+| **认证方式** | Bearer Token                | Bearer Token                           |
+| **主要模型** | GPT-3.5, GPT-4              | DeepSeek, 其他国内模型                 |
+| **使用方式** | `from openai import OpenAI` | requests 或 OpenAI 库（指定 base_url） |
 
 ---
 
@@ -408,7 +650,7 @@ cache = {}
 def get_cached_response(prompt):
     if prompt in cache:
         return cache[prompt]
-    
+
     response = client.chat.completions.create(...)
     result = response.choices[0].message.content
     cache[prompt] = result
@@ -454,4 +696,3 @@ OpenAI API 提供了强大的 AI 能力，主要步骤：
 - [OpenAI 官方文档](https://platform.openai.com/docs)
 - [API 参考](https://platform.openai.com/docs/api-reference)
 - 探索更多模型和功能
-
